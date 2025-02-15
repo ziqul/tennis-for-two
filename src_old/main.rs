@@ -13,9 +13,9 @@ pub mod consts {
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 enum Screen {
-    #[default]
     Splash,
-    //Title,
+    #[default]
+    Title,
     Exit,
 }
 
@@ -37,7 +37,7 @@ fn main() {
       ..default()
     }))
 
-    .insert_resource(ClearColor(Color::srgb(0.0, 0.0, 0.0)))
+    .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
 
     .init_state::<Screen>()
     .add_systems(Startup, setup)
@@ -45,6 +45,7 @@ fn main() {
 
     .add_plugins((
       screens_logic::splash::plugin,
+      screens_logic::title::plugin,
     ))
 
     .run();
@@ -59,7 +60,7 @@ fn exit_check(
   mut exit: EventWriter<AppExit>,
 ) {
   if *state.get() == Screen::Exit {
-    exit.send(AppExit::Success);
+    exit.send(AppExit);
   }
 }
 

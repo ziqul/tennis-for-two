@@ -78,7 +78,7 @@ fn draw_title_ui(
       // Menu Container
       <div
         id="menu-container"
-        s:height="500px"
+        s:height="200px"
         s:align-items="center"
         s:justify-content="center"
       >

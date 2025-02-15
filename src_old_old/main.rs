@@ -1,22 +1,26 @@
+use belly::prelude::*;
 use bevy::prelude::*;
 use bevy::app::AppExit;
 
 
-pub mod screens_logic;
-pub mod ui_elements;
+mod screens;
+
+pub mod menus;
+pub mod utils;
+
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+enum GameState {
+    Splash,
+    #[default]
+    Title,
+    Exit,
+}
+
 
 pub mod consts {
   pub const LOGICAL_RESOULUTION: (f32, f32) = (640.0, 480.0);
   //pub const PHYSICAL_RESOULUTION: (f32, f32) = (1280.0, 720.0);
-}
-
-
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-enum Screen {
-    #[default]
-    Splash,
-    //Title,
-    Exit,
 }
 
 
@@ -36,40 +40,31 @@ fn main() {
       }),
       ..default()
     }))
+    .add_plugins(BellyPlugin)
 
-    .insert_resource(ClearColor(Color::srgb(0.0, 0.0, 0.0)))
+    .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
 
-    .init_state::<Screen>()
+    .init_state::<GameState>()
     .add_systems(Startup, setup)
     .add_systems(Update, exit_check)
 
     .add_plugins((
-      screens_logic::splash::plugin,
+        screens::splash::plugin,
+        screens::title::plugin,
     ))
-
     .run();
 }
+
 
 pub fn setup(mut commands: Commands) {
   commands.spawn(Camera2dBundle::default());
 }
 
 fn exit_check(
-  state: Res<State<Screen>>,
+  state: Res<State<GameState>>,
   mut exit: EventWriter<AppExit>,
 ) {
-  if *state.get() == Screen::Exit {
-    exit.send(AppExit::Success);
+  if *state.get() == GameState::Exit {
+    exit.send(AppExit);
   }
-}
-
-// Generic system that takes a component as a parameter,
-// and will despawn all entities with that component.
-pub fn despawn_by_tag<T: Component>(
-  to_despawn: Query<Entity, With<T>>,
-  mut commands: Commands,
-) {
-    for entity in &to_despawn {
-        commands.entity(entity).despawn_recursive();
-    }
 }
